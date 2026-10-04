@@ -1,10 +1,12 @@
 
 const express = require("express");
 
-const path =require("path")
-const{connectTomongodb} = require("./connect")
+const path =require("path");
 
+const cookieParser = require("cookie-parser");
+const{connectTomongodb} = require("./connect");
 
+const {restricttologgedinuseronly, checkauth}=require("./middleware/auth");
 
 const URL = require("./models/url");
 
@@ -27,9 +29,10 @@ app.use(express.urlencoded({ extended:false}));
 //         urls:allurls,
 //     });
 // })   test url pr jane se use hoga eska
-app.use("/url",urlRoute);
+app.use(cookieParser());
+app.use("/url",restricttologgedinuseronly,urlRoute);
 app.use("/user",userRoute);
-app.use("/",staticRoute);
+app.use("/",checkauth,staticRoute);
 
 app.get("/url/:shortId",async (req,res)=>{
 const shortId= req.params.shortId;
